@@ -1,0 +1,46 @@
+before_script:
+  - dotnet --version
+  - PRJ_NAME=cps_csharp
+  - PRJ=$CSHARPPATH/$PRJ_NAME
+  - rm -rf $PRJ
+  - ln -s $CI_PROJECT_DIR $PRJ
+  
+stages:
+  - build
+  - release
+  - test
+  
+build:
+  stage: build
+  tags:
+    - csharp
+  script:
+    - cd $PRJ
+    - make release
+  except:
+    - tags
+
+release:
+  stage: release
+  artifacts:
+    name: "cps_csharp_${CI_COMMIT_REF_NAME}"
+    paths: 
+    - build/
+  script:
+    - cd $PRJ
+    - make release
+  tags:
+    - csharp
+  only:
+    - tags   
+
+test:
+  stage: test
+  tags:
+    - csharp
+  script:
+    - cd $PRJ
+    - make test
+  except:
+    - tags
+
